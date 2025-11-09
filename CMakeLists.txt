@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.15)
 project(libcanon VERSION 0.1.0 LANGUAGES CXX)
 
 # OPTIONS
@@ -8,6 +8,8 @@ option(BUILD_DOCS "Build the API documentation" OFF)
 
 # Set the building options.
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # The main components.
 add_subdirectory(include)
@@ -35,7 +37,7 @@ write_basic_package_version_file(${CONFIGVERSION_FILE}
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY SameMajorVersion)
 install(EXPORT libcanon_exports FILE libcanon-targets.cmake
-        NAMESPACE libcanon DESTINATION ${CONFIG_DESTINATION})
+        NAMESPACE libcanon:: DESTINATION ${CONFIG_DESTINATION})
 install(FILES ${CONFIG_FILE} ${CONFIGVERSION_FILE}
         DESTINATION ${CONFIG_DESTINATION})
 
