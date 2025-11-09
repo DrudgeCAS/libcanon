@@ -1,8 +1,8 @@
-# The phony licanon library for export.
+# The phony libcanon library for export.
 add_library(headers INTERFACE)
 target_include_directories(headers INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libcanon>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libcanon>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 install(TARGETS headers EXPORT libcanon_exports)
 
 # Installation of the real thing.

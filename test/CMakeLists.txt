@@ -13,10 +13,7 @@ add_subdirectory(googletest EXCLUDE_FROM_ALL)
 include(CTest)
 function(add_simple_test name)
     add_executable("${name}" "${name}.cpp")
-    target_include_directories("${name}" PRIVATE 
-        "${libcanon_SOURCE_DIR}/include"
-        "${gtest_SOURCE_DIR}/include")
-    target_link_libraries("${name}" gtest gtest_main)
+    target_link_libraries("${name}" PRIVATE headers gtest gtest_main)
     add_test(NAME "${name}" COMMAND "${name}")
 endfunction()
 
