@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/eldag_test.dir/link.d CMakeFiles/eldag_test.dir/eldag_test.cpp.o -o eldag_test  googletest/googletest/libgtest.a googletest/googletest/libgtest_main.a googletest/googletest/libgtest.a
