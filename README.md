@@ -36,3 +36,10 @@ University to be used in the symbolic tensorial algebra system
 Center for the Computational Design of Functional Layered Materials, an Energy
 Frontier Research Center funded by the U.S.  Department of Energy, Office of
 Science, Basic Energy Sciences under Award DE-SC0012575.
+
+## Releases
+
+This project uses [release-please](https://github.com/googleapis/release-please) 
+for automated release management. Releases are automatically created when changes 
+are merged to the master branch following [Conventional Commits](https://www.conventionalcommits.org/) 
+format. The CHANGELOG is automatically maintained based on commit messages.
