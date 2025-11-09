@@ -29,10 +29,22 @@ each internal node.  Canonicalization of normal directed and undirected graphs
 can also be reduced to ELDAG canonicalized.  Actual direct support of plain
 graph canonicalization is to be implemented.
 
+## Releases
 
-Libcanon is developed by Jinmo Zhao and Prof Gustavo E Scuseria at Rice
-University to be used in the symbolic tensorial algebra system
-[drudge](https://github.com/tschijnmo/drudge).  It was supported as part of the
-Center for the Computational Design of Functional Layered Materials, an Energy
-Frontier Research Center funded by the U.S.  Department of Energy, Office of
-Science, Basic Energy Sciences under Award DE-SC0012575.
+This project uses
+[release-please](https://github.com/googleapis/release-please) for automated
+release management. Releases are automatically created when changes are merged
+to the master branch following [Conventional
+Commits](https://www.conventionalcommits.org/) format. The CHANGELOG is
+automatically maintained based on commit messages.
+
+## Acknowledgments
+
+Libcanon was developed by Jinmo Zhao at Rice University, under the supervision
+of Prof. Gustavo E. Scuseria, as a component of the symbolic tensorial algebra
+system [drudge](https://github.com/DrudgeCAS/drudge).  It was supported as part
+of the Center for the Computational Design of Functional Layered Materials, an
+Energy Frontier Research Center funded by the U.S.  Department of Energy,
+Office of Science, Basic Energy Sciences under Award DE-SC0012575. The package
+is currently maintained by Guo P. Chen and other members of the Scuseria group.
+
