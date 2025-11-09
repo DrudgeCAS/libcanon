@@ -9,6 +9,8 @@ on:
 jobs:
   test_debug:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -39,6 +41,8 @@ jobs:
 
   test_release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
