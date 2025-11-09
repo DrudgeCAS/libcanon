@@ -1,4 +1,4 @@
-[![Build Status](https://circleci.com/gh/tschijnmo/libcanon.svg?style=shield)](https://circleci.com/gh/tschijnmo/libcanon)
+[![CI](https://github.com/DrudgeCAS/libcanon/actions/workflows/ci.yml/badge.svg)](https://github.com/DrudgeCAS/libcanon/actions/workflows/ci.yml)
 
 # libcanon
 

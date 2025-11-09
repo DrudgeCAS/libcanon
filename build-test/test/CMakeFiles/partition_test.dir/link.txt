@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/partition_test.dir/link.d CMakeFiles/partition_test.dir/partition_test.cpp.o -o partition_test  googletest/googletest/libgtest.a googletest/googletest/libgtest_main.a googletest/googletest/libgtest.a

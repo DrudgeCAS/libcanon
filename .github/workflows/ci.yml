@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test_debug:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake g++
+    
+    - name: Configure CMake (Debug)
+      run: |
+        mkdir -p build-debug
+        cd build-debug
+        cmake -DCMAKE_BUILD_TYPE=debug ..
+    
+    - name: Build (Debug)
+      run: |
+        cd build-debug
+        make
+    
+    - name: Run tests (Debug)
+      run: |
+        cd build-debug
+        ctest --output-on-failure
+
+  test_release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake g++
+    
+    - name: Configure CMake (Release)
+      run: |
+        mkdir -p build-release
+        cd build-release
+        cmake -DCMAKE_BUILD_TYPE=release ..
+    
+    - name: Build (Release)
+      run: |
+        cd build-release
+        make
+    
+    - name: Run tests (Release)
+      run: |
+        cd build-release
+        ctest --output-on-failure

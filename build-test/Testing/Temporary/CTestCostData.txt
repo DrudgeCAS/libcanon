@@ -1,4 +1,0 @@
-string_test 1 0.0028419
-partition_test 1 0.00168482
-eldag_test 1 0.0103171
----

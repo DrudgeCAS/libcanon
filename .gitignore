@@ -30,3 +30,8 @@
 
 # For Clion
 .idea/workspace.xml
+
+# Build directories
+build/
+build-*/
+cmake-build-*/
