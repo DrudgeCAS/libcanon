@@ -167,7 +167,6 @@ template<typename R, typename Container>
 concept Refiner_container = requires (
         Container container, Act_res_of<R> res, Perm_of<R> perm) {
     container.emplace(res, perm);
-    container.find(res);
     { *container.find(res) } -> std::convertible_to<std::pair<const Act_res_of<R>, Perm_of<R>>>;
     typename Container::reference;
 };
