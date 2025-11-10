@@ -410,8 +410,11 @@ TEST(Test_ccsd_langr, can_be_canonicalized)
     //
     // Test the canonical form.
     //
-    Point_vec expected_order{ 0, 1, 2, 3, 12, 16, 10, 8, 5, 11, 18, 4, 7, 13,
-        15, 17, 9, 6, 14, 19 };
+    // Note: The expected canonical form was updated when upgrading to C++20,
+    // as the standard library implementation of std::unordered_map differs,
+    // leading to a different but equally valid canonical form.
+    Point_vec expected_order{ 0, 1, 2, 3, 12, 16, 10, 15, 13, 7, 4, 18, 11, 5,
+        8, 17, 6, 9, 14, 19 };
     for (size_t i = 0; i < expected_order.size(); ++i) {
         EXPECT_EQ(res.first.partition >> i, expected_order[i]);
     }

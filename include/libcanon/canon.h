@@ -119,7 +119,6 @@ using Transv_of = Ensure_unique_ptr_t<decltype(std::declval<R>().create_transv(
 // The refiner protocol.
 //
 
-#ifdef __cpp_concepts
 // clang-format off
 
 //
@@ -134,27 +133,27 @@ using Transv_of = Ensure_unique_ptr_t<decltype(std::declval<R>().create_transv(
  */
 
 template<typename R>
-concept bool Refiner = requires () {
+concept Refiner = requires () {
     typename Coset_of<R>;
     typename Structure_of<R>;
     typename Perm_of<R>;
-    typename Action_res_of<R>;
+    typename Act_res_of<R>;
     typename Transv_of<R>;
 } && requires (R refiner,
         Coset_of<R> coset, Structure_of<R> obj,
-        Perm_of_R<R> perm, Perm_of_R<R> perm2,
-        Transv_of_R<R> transv, Transv_of_R<R> target_transv) {
-    // For refiner itself.
+        Perm_of<R> perm, Perm_of<R> perm2,
+        Transv_of<R> transv, Transv_of<R> target_transv) {
+    // For refiner itself
     { refiner.refine(obj, coset) } -> Simple_iterable<Coset_of<R>>;
-    { refiner.is_leaf(obj, coset) } -> bool;
+    { refiner.is_leaf(obj, coset) } -> std::convertible_to<bool>;
 
-    // For the action.
-    { refiner.act(perm, obj) } -> Act_res_of<R>;
-    { refiner.left_mult(perm, coset) } -> Coset_of<R>;
+    // For the action
+    { refiner.act(perm, obj) } -> std::convertible_to<Act_res_of<R>>;
+    { refiner.left_mult(perm, coset) } -> std::convertible_to<Coset_of<R>>;
 
-    // For the transversal container.
-    { transv.insert(perm | ~perm2) };
-    { adapt_transv(transv, target_transv) }
+    // For the transversal container
+    transv.insert(perm | ~perm2);
+    adapt_transv(transv, target_transv);
 };
 
 /** Concept for a container able to work with a refiner.
@@ -164,16 +163,15 @@ concept bool Refiner = requires () {
  * any form, to yield a pair composed from an action result and a permutation.
  */
 
-template<typename R, typename C>
-concept bool Refiner_container = requires (
+template<typename R, typename Container>
+concept Refiner_container = requires (
         Container container, Act_res_of<R> res, Perm_of<R> perm) {
-    { container.emplace(res, perm) };
-    { *container.find(res) } -> std::pair<const Act_res_of<R>, Perm_of<R>>;
+    container.emplace(res, perm);
+    { *container.find(res) } -> std::convertible_to<std::pair<const Act_res_of<R>, Perm_of<R>>>;
     typename Container::reference;
 };
 
 // clang-format on
-#endif
 
 //
 // Some internal data structure and algorithms.

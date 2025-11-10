@@ -9,7 +9,6 @@
 
 namespace libcanon {
 
-#ifdef __cpp_concepts
 // clang-format off
 
 //
@@ -20,16 +19,15 @@ namespace libcanon {
 //
 
 template<typename I, typename T>
-concept bool Simple_iterable = requires (I iterable) {
-    { begin(i) };
-    { end(i) };
-    { ++begin(i) };
-    { begin(i) != end(i) } -> bool;
-    { *begin(i) } -> T&&;
-}
+concept Simple_iterable = requires (I iterable) {
+    { begin(iterable) };
+    { end(iterable) };
+    { ++begin(iterable) };
+    { begin(iterable) != end(iterable) } -> std::convertible_to<bool>;
+    { *begin(iterable) } -> std::convertible_to<T>;
+};
 
 // clang-format on
-#endif
 
 /** Combines the given hash values.
  *
