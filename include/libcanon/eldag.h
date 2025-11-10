@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
-#include <map>
 #include <memory>
 #include <numeric>
 #include <type_traits>
@@ -1239,7 +1238,7 @@ std::pair<Eldag_perm<P>, std::unique_ptr<Sims_transv<P>>> canon_eldag(
     Eldag_refiner<P> refiner{};
     Eldag_coset<P> root_coset(eldag, init_part, symms);
 
-    using Container = std::map<Eldag, Eldag_perm<P>>;
+    using Container = std::unordered_map<Eldag, Eldag_perm<P>>;
     Container container{};
 
     auto aut = add_all_candidates(refiner, eldag, root_coset, container);

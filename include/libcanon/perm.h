@@ -547,7 +547,7 @@ template <typename P, typename It> P chain(size_t size, It begin, It end)
 template <typename T>
 concept Transv = requires () {
     typename T::Perm;
-} && requires (
+} && Simple_iterable<Transv, typename T::Perm> && requires (
     T transv, typename T::Perm perm) {
     { transv.next() } -> std::convertible_to<T*>;
     { transv.has(perm) } -> std::convertible_to<bool>;
