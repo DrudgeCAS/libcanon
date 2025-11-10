@@ -146,7 +146,7 @@ concept Refiner = requires () {
         Perm_of<R> perm, Perm_of<R> perm2,
         Transv_of<R> transv, Transv_of<R> target_transv) {
     // For refiner itself.
-    refiner.refine(obj, coset);
+    { refiner.refine(obj, coset) } -> Simple_iterable<Coset_of<R>>;
     { refiner.is_leaf(obj, coset) } -> std::convertible_to<bool>;
 
     // For the action.
