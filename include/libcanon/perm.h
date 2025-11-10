@@ -542,22 +542,20 @@ template <typename P, typename It> P chain(size_t size, It begin, It end)
 // ----------------------
 //
 
-#ifdef __cpp_concepts
 // clang-format off
 
 template <typename T>
-concept bool Transv = requires () {
+concept Transv = requires () {
     typename T::Perm;
-} && Simple_iterable<Transv, typename T::Perm> && requires (
+} && requires (
     T transv, typename T::Perm perm) {
-    { transv.next() } -> T*;
-    { transv.has(perm) } -> bool;
-    { transv.get_repr(perm) } -> const T::Perm*;
-    { transv.insert(perm) } -> const T::Perm*;
+    { transv.next() } -> std::convertible_to<T*>;
+    { transv.has(perm) } -> std::convertible_to<bool>;
+    { transv.get_repr(perm) } -> std::convertible_to<const typename T::Perm*>;
+    { transv.insert(perm) } -> std::convertible_to<const typename T::Perm*>;
 };
 
 // clang-format on
-#endif
 
 //
 // Generic transversal algorithms

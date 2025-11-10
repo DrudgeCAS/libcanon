@@ -50,11 +50,13 @@
 
 #include <algorithm>
 #include <cassert>
+#include <map>
 #include <memory>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include <libcanon/utils.h>
 
@@ -119,7 +121,6 @@ using Transv_of = Ensure_unique_ptr_t<decltype(std::declval<R>().create_transv(
 // The refiner protocol.
 //
 
-#ifdef __cpp_concepts
 // clang-format off
 
 //
@@ -134,27 +135,27 @@ using Transv_of = Ensure_unique_ptr_t<decltype(std::declval<R>().create_transv(
  */
 
 template<typename R>
-concept bool Refiner = requires () {
+concept Refiner = requires () {
     typename Coset_of<R>;
     typename Structure_of<R>;
     typename Perm_of<R>;
-    typename Action_res_of<R>;
+    typename Act_res_of<R>;
     typename Transv_of<R>;
 } && requires (R refiner,
         Coset_of<R> coset, Structure_of<R> obj,
-        Perm_of_R<R> perm, Perm_of_R<R> perm2,
-        Transv_of_R<R> transv, Transv_of_R<R> target_transv) {
+        Perm_of<R> perm, Perm_of<R> perm2,
+        Transv_of<R> transv, Transv_of<R> target_transv) {
     // For refiner itself.
-    { refiner.refine(obj, coset) } -> Simple_iterable<Coset_of<R>>;
-    { refiner.is_leaf(obj, coset) } -> bool;
+    refiner.refine(obj, coset);
+    { refiner.is_leaf(obj, coset) } -> std::convertible_to<bool>;
 
     // For the action.
-    { refiner.act(perm, obj) } -> Act_res_of<R>;
-    { refiner.left_mult(perm, coset) } -> Coset_of<R>;
+    refiner.act(perm, obj);
+    refiner.left_mult(perm, coset);
 
     // For the transversal container.
-    { transv.insert(perm | ~perm2) };
-    { adapt_transv(transv, target_transv) }
+    transv.insert(perm | ~perm2);
+    adapt_transv(transv, target_transv);
 };
 
 /** Concept for a container able to work with a refiner.
@@ -165,15 +166,14 @@ concept bool Refiner = requires () {
  */
 
 template<typename R, typename C>
-concept bool Refiner_container = requires (
-        Container container, Act_res_of<R> res, Perm_of<R> perm) {
-    { container.emplace(res, perm) };
-    { *container.find(res) } -> std::pair<const Act_res_of<R>, Perm_of<R>>;
-    typename Container::reference;
+concept Refiner_container = requires (
+        C container, Act_res_of<R> res, Perm_of<R> perm) {
+    container.emplace(res, perm);
+    container.find(res);
+    typename C::reference;
 };
 
 // clang-format on
-#endif
 
 //
 // Some internal data structure and algorithms.
@@ -389,20 +389,29 @@ public:
         // identical siblings.
         set_paths();
 
-        // Loop over all the experimental path by iterator for unordered_map
-        // for faster removal without hashing and equality comparison involved.
-        // The price to pay is the duplication of ++child_it.
+        // Collect and sort children by hash for deterministic ordering.
+        // This ensures consistent behavior across C++ standard library implementations.
+        std::vector<std::pair<const Coset*, Exp_path*>> sorted_children;
+        for (auto& child : children_) {
+            sorted_children.emplace_back(&child.first, child.second.get());
+        }
+        std::sort(sorted_children.begin(), sorted_children.end(),
+            [](const auto& a, const auto& b) {
+                return std::hash<Coset>{}(*a.first) < std::hash<Coset>{}(*b.first);
+            });
 
-        auto child_it = children_.begin();
-        while (child_it != children_.end()) {
-            Exp_path* curr = child_it->second.get();
+        // Loop over children in sorted order.
+        for (const auto& [coset_ptr, exp_path_ptr] : sorted_children) {
+            // Check if this child was already erased in a previous iteration
+            if (children_.find(*coset_ptr) == children_.end()) {
+                continue;
+            }
 
-            const auto& leaf = curr->get_a_leaf();
+            const auto& leaf = exp_path_ptr->get_a_leaf();
 
             auto existing = container.find(leaf.form());
             if (existing == container.end()) {
                 // Non identical siblings will be treated later.
-                ++child_it;
                 continue;
             } else {
                 // When we find an identical sibling.
@@ -415,9 +424,7 @@ public:
                 // anchor.
                 auto inserted = aut->insert(leaf.perm() | ~existing->second);
                 assert(inserted);
-                auto to_remove = child_it; // Make a copy of the iterator.
-                ++child_it;
-                children_.erase(to_remove);
+                children_.erase(*coset_ptr);
                 // Note that the pointers curr_exp_path_ and curr_coset_
                 // will be invalidated after this loop.
             }
@@ -450,17 +457,23 @@ private:
     /** Sets the current coset and experimental path to begin of children.
      *
      * False will be returned if the children container is empty.
+     * Selects the child with minimum hash for deterministic ordering.
      */
 
     bool set_curr()
     {
-        auto begin = children_.begin();
-        if (begin == children_.end())
+        if (children_.empty())
             return false;
 
-        curr_coset_ = &begin->first;
-        set_path(*begin);
-        curr_exp_path_ = begin->second.get();
+        // Select child with minimum hash for deterministic ordering
+        auto min_it = std::min_element(children_.begin(), children_.end(),
+            [](const auto& a, const auto& b) {
+                return std::hash<Coset>{}(a.first) < std::hash<Coset>{}(b.first);
+            });
+
+        curr_coset_ = &min_it->first;
+        set_path(*min_it);
+        curr_exp_path_ = min_it->second.get();
         assert(curr_exp_path_);
 
         return true;
