@@ -170,6 +170,7 @@ concept Refiner_container = requires (
         C container, Act_res_of<R> res, Perm_of<R> perm) {
     container.emplace(res, perm);
     container.find(res);
+    { *container.find(res) } -> std::convertible_to<std::pair<const Act_res_of<R>, Perm_of<R>>>;
     typename C::reference;
 };
 
