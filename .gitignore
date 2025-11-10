@@ -35,3 +35,4 @@
 build/
 build-*/
 cmake-build-*/
+_codeql_build_dir/
