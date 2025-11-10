@@ -150,8 +150,8 @@ concept Refiner = requires () {
     { refiner.is_leaf(obj, coset) } -> std::convertible_to<bool>;
 
     // For the action.
-    refiner.act(perm, obj);
-    refiner.left_mult(perm, coset);
+    { refiner.act(perm, obj) } -> std::convertible_to<Act_res_of<R>>;
+    { refiner.left_mult(perm, coset) } -> std::convertible_to<Coset_of<R>>;
 
     // For the transversal container.
     transv.insert(perm | ~perm2);
@@ -401,10 +401,13 @@ public:
                 return std::hash<Coset>{}(*a.first) < std::hash<Coset>{}(*b.first);
             });
 
+        // Track erased coset pointers to avoid redundant lookups
+        std::unordered_set<const Coset*> erased_cosets;
+
         // Loop over children in sorted order.
         for (const auto& [coset_ptr, exp_path_ptr] : sorted_children) {
-            // Check if this child was already erased in a previous iteration
-            if (children_.find(*coset_ptr) == children_.end()) {
+            // Skip if this child was already erased
+            if (erased_cosets.find(coset_ptr) != erased_cosets.end()) {
                 continue;
             }
 
@@ -425,6 +428,7 @@ public:
                 // anchor.
                 auto inserted = aut->insert(leaf.perm() | ~existing->second);
                 assert(inserted);
+                erased_cosets.insert(coset_ptr);
                 children_.erase(*coset_ptr);
                 // Note that the pointers curr_exp_path_ and curr_coset_
                 // will be invalidated after this loop.
