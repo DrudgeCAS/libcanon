@@ -1,0 +1,40 @@
+# Dependabot configuration for automatic dependency updates
+# See https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# This library has no package-manager dependencies of its own; it is
+# header-only.  What can go stale is the googletest submodule used by the
+# tests, and the actions used by the workflows.
+
+version: 2
+updates:
+  # Update GitHub Actions monthly
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "saturday"
+      time: "09:00"
+      timezone: "America/New_York"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    open-pull-requests-limit: 3
+
+  # Update Git submodules monthly
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "saturday"
+      time: "09:00"
+      timezone: "America/New_York"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "submodule"
+    open-pull-requests-limit: 2
