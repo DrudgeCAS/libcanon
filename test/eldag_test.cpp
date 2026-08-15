@@ -416,3 +416,52 @@ TEST(Test_ccsd_langr, can_be_canonicalized)
         EXPECT_EQ(res.first.partition >> i, expected_order[i]);
     }
 }
+
+/** Tests canonicalization of a graph with several automorphism orbits.
+ *
+ * A union of disjoint directed cycles, all of whose nodes share one colour.
+ * The initial refinement leaves every node in a single cell, so the
+ * individualization branches genuinely have to be pruned by automorphisms,
+ * which is the path that reaches `left_mult`.
+ *
+ * The automorphism group of two 2-cycles and one 3-cycle is
+ * (Z2 wr S2) x Z3, of order 24.
+ */
+
+TEST(Test_cycle_union, can_be_canonicalized)
+{
+    // Two cycles of length 2 and one of length 3.
+    const std::vector<size_t> lengths{ 2, 2, 3 };
+
+    Eldag eldag{};
+    size_t base = 0;
+    for (size_t length : lengths) {
+        for (size_t i = 0; i < length; ++i) {
+            eldag.edges.push_back(base + (i + 1) % length);
+            eldag.update_ia();
+        }
+        base += length;
+    }
+
+    const size_t n_nodes = base;
+    Node_symms<Simple_perm> symms(n_nodes, nullptr);
+    auto res = canon_eldag(eldag, symms, [](auto point) { return 0; });
+
+    // The canonical form has to be stable under recanonicalization.
+    Eldag canon_form = act_eldag(res.first, eldag);
+    auto res2 = canon_eldag(canon_form, symms, [](auto point) { return 0; });
+    EXPECT_EQ(act_eldag(res2.first, canon_form), canon_form);
+
+    // |(Z2 wr S2) x Z3| = 8 * 3 = 24.
+    size_t order = 1;
+    for (const Sims_transv<Simple_perm>* transv = res.second.get();
+         transv != nullptr; transv = transv->next()) {
+        size_t n_cosets = 1;
+        for (const auto& perm : *transv) {
+            (void)perm;
+            ++n_cosets;
+        }
+        order *= n_cosets;
+    }
+    EXPECT_EQ(order, 24);
+}

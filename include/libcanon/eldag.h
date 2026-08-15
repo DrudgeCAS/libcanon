@@ -435,7 +435,7 @@ public:
         , symms_()
         , refined_perms_()
         , refined_symms_()
-        , individualized_(perm << base.individualized())
+        , individualized_(perm >> base.individualized())
     {
     }
 
