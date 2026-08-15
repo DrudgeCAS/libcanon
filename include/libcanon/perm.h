@@ -637,6 +637,24 @@ template <typename T> void adapt_transv(T& input, T& output)
             std::back_inserter(passed_perms));
 
         // Swap space for the permutations to pass down.
+        //
+        // The two loops below push into this vector while `passed` can hold
+        // pointers into it, so it must not reallocate.  This reserve is
+        // sufficient, for a reason worth recording since it is not obvious:
+        // each permutation in `passed` causes at most one push in total.
+        //
+        // A push happens only for a permutation fixing the level target.  In
+        // the second loop the product `*i | *j` fixes the target exactly when
+        // `j >> target == i << target`, and since a transversal holds at most
+        // one representative per coset label, at most one `j` can satisfy
+        // that.  Further, if `i` was itself pushed in the first loop then `i`
+        // fixes the target, the required label is the target itself, and no
+        // representative is ever stored under that label.  So such an `i`
+        // causes no push at all in the second loop.
+        //
+        // Pushes per level are therefore bounded by `passed.size()`, which is
+        // what is reserved here.  Should the transversal contract change, the
+        // assertion at the end of the level loop will catch it.
         Perm_vector perms_to_pass{};
         perms_to_pass.reserve(passed_perms.size());
 
@@ -677,6 +695,10 @@ template <typename T> void adapt_transv(T& input, T& output)
                         *i | *j, *curr_output, perms_to_pass);
                 }
             }
+
+            // See the reasoning at the reserve above: the pushes at this
+            // level can never exceed the number of permutations passed in.
+            assert(perms_to_pass.size() <= passed.size());
 
             swap(passed_perms, perms_to_pass);
             perms_to_pass.clear();
