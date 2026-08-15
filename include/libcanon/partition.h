@@ -92,6 +92,16 @@ public:
             return *this;
         }
 
+        /** Increments a cell iterator, postfix version.
+         */
+
+        Cell_it operator++(int)
+        {
+            Cell_it prev(*this);
+            ++(*this);
+            return prev;
+        }
+
         /** Dereferences a cell iterator.
          *
          * The dereferenced point is *any point in the cell*.  And the result
@@ -117,7 +127,7 @@ public:
          * iterators for the same partition in the same direction.
          */
 
-        bool operator==(const Cell_it& other)
+        bool operator==(const Cell_it& other) const
         {
             assert(this->partition_ == other.partition_);
             assert(this->if_rev_ == other.if_rev_);
@@ -127,7 +137,7 @@ public:
         /** Compares two iterators for inequality.
          */
 
-        bool operator!=(const Cell_it& other) { return !(*this == other); }
+        bool operator!=(const Cell_it& other) const { return !(*this == other); }
 
         /** If the iterator is a reverse one.
          */
@@ -148,7 +158,7 @@ public:
         /** The cached size of the partition.
          */
 
-        const size_t size_;
+        size_t size_;
 
         /** If this iterator goes in the reverse direction.
          */
