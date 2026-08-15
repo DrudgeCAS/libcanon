@@ -136,7 +136,7 @@ bool operator==(const Perm_expr<T1>& perm1, const Perm_expr<T2>& perm2)
  */
 
 template <typename P>
-using Acc_of = std::decay_t<std::result_of_t<decltype (&P::acc)(P)>>;
+using Acc_of = std::decay_t<std::invoke_result_t<decltype (&P::acc), P>>;
 
 /** Atomic permutation type.
  *
