@@ -119,6 +119,7 @@ public:
 
     const P* get_repr(Point point) const
     {
+        assert(point < transv_.size());
         const auto& found = transv_[point];
 
         // Slight redundancy for clarity.
@@ -305,7 +306,7 @@ public:
 
         void find_next_present()
         {
-            while (!transv_->get_repr(curr_) && curr_ < transv_->size()) {
+            while (curr_ < transv_->size() && !transv_->get_repr(curr_)) {
                 ++curr_;
             }
         }
