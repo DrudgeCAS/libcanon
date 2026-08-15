@@ -394,13 +394,16 @@ public:
     Eldag_coset(
         const Eldag& eldag, T&& init_part, const Node_symms<P>& init_symms)
         : partition_(std::forward<T>(init_part))
-        , perms_(init_part.size(), nullptr)
+        , perms_(partition_.size(), nullptr)
         , symms_(init_symms)
-        , refined_perms_(init_part.size())
-        , refined_symms_(init_part.size())
-        , individualized_(init_part.size())
+        , refined_perms_(partition_.size())
+        , refined_symms_(partition_.size())
+        , individualized_(partition_.size())
     {
-        assert(init_part.size() == init_symms.size());
+        // Note that `init_part` may have been moved from above, so the sizes
+        // have to be read back from `partition_`, which is declared first and
+        // is thus already initialized.
+        assert(partition_.size() == init_symms.size());
         refine(eldag);
     }
 
@@ -1248,6 +1251,16 @@ template <typename P, typename F>
 std::pair<Eldag_perm<P>, std::unique_ptr<Sims_transv<P>>> canon_eldag(
     const Eldag& eldag, const Node_symms<P>& symms, F init_colour)
 {
+    if (eldag.size() == 0) {
+        // Degenerate input: there is nothing to canonicalize, and the
+        // refinement machinery below indexes the partition unconditionally.
+        //
+        // The size agreement is normally checked by the Eldag_coset
+        // constructor, which is skipped here, so it is asserted directly.
+        assert(eldag.size() == symms.size());
+        return { Eldag_perm<P>{ Node_perms<P>(0), Partition(0) }, nullptr };
+    }
+
     Partition init_part(eldag.size());
     init_part.split_by_key(0, init_colour);
 
