@@ -170,3 +170,17 @@ TEST_F(Test_partition, can_be_individualized)
         EXPECT_EQ(indived, Partition({ indived_cell, rest_cell }));
     }
 }
+
+/** Tests that an empty partition can be split without going out of bounds.
+ *
+ * An empty partition has no cell at all, so there is nothing for
+ * `split_by_key` to do.  It used to index the cell boundary arrays
+ * unconditionally, which reads past the end of an empty vector.
+ */
+
+TEST(Test_empty_partition, can_be_split_by_key)
+{
+    Partition partition(0);
+    EXPECT_EQ(partition.size(), 0);
+    EXPECT_FALSE(partition.split_by_key(0, [](auto point) { return 0; }));
+}

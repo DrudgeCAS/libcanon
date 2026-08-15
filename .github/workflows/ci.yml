@@ -106,3 +106,26 @@ jobs:
       run: |
         cd build-clang
         ctest --output-on-failure
+
+  test_msvc:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Configure CMake (Debug, MSVC)
+      run: |
+        cmake -B build-msvc -DCMAKE_BUILD_TYPE=Debug .
+    
+    - name: Build (Debug, MSVC)
+      run: |
+        cmake --build build-msvc --config Debug
+    
+    - name: Run tests (Debug, MSVC)
+      run: |
+        ctest --test-dir build-msvc -C Debug --output-on-failure
