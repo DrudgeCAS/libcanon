@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(libcanon VERSION 0.1.2 LANGUAGES CXX) # x-release-please-version
+project(libcanon VERSION 0.1.3 LANGUAGES CXX) # x-release-please-version
 
 # OPTIONS
 include(GNUInstallDirs)
