@@ -394,13 +394,16 @@ public:
     Eldag_coset(
         const Eldag& eldag, T&& init_part, const Node_symms<P>& init_symms)
         : partition_(std::forward<T>(init_part))
-        , perms_(init_part.size(), nullptr)
+        , perms_(partition_.size(), nullptr)
         , symms_(init_symms)
-        , refined_perms_(init_part.size())
-        , refined_symms_(init_part.size())
-        , individualized_(init_part.size())
+        , refined_perms_(partition_.size())
+        , refined_symms_(partition_.size())
+        , individualized_(partition_.size())
     {
-        assert(init_part.size() == init_symms.size());
+        // Note that `init_part` may have been moved from above, so the sizes
+        // have to be read back from `partition_`, which is declared first and
+        // is thus already initialized.
+        assert(partition_.size() == init_symms.size());
         refine(eldag);
     }
 
@@ -1020,11 +1023,27 @@ private:
             Orbit orbit(n_valences);
             std::iota(orbit.begin(), orbit.end(), 0);
 
-            for (size_t base = 0; base < n_valences; ++base) {
-                for (const Sims_transv<P>* transv = symms_[node];
-                     transv != nullptr; transv = transv->next()) {
-                    for (const auto& perm : *transv) {
-                        orbit[perm << base] = orbit[base];
+            // The orbit relation has to be closed, not just swept once.  A
+            // single forward pass propagates a label only along the images it
+            // happens to reach in increasing order of the base point, which
+            // leaves points in the same orbit carrying different labels.  Keep
+            // propagating the smaller label until nothing changes, so that
+            // every orbit ends up labelled by its least point.
+            bool changed = true;
+            while (changed) {
+                changed = false;
+                for (size_t base = 0; base < n_valences; ++base) {
+                    for (const Sims_transv<P>* transv = symms_[node];
+                         transv != nullptr; transv = transv->next()) {
+                        for (const auto& perm : *transv) {
+                            size_t img = perm << base;
+                            size_t lo = std::min(orbit[base], orbit[img]);
+                            if (orbit[base] != lo || orbit[img] != lo) {
+                                orbit[base] = lo;
+                                orbit[img] = lo;
+                                changed = true;
+                            }
+                        }
                     }
                 }
             }
@@ -1232,6 +1251,16 @@ template <typename P, typename F>
 std::pair<Eldag_perm<P>, std::unique_ptr<Sims_transv<P>>> canon_eldag(
     const Eldag& eldag, const Node_symms<P>& symms, F init_colour)
 {
+    if (eldag.size() == 0) {
+        // Degenerate input: there is nothing to canonicalize, and the
+        // refinement machinery below indexes the partition unconditionally.
+        //
+        // The size agreement is normally checked by the Eldag_coset
+        // constructor, which is skipped here, so it is asserted directly.
+        assert(eldag.size() == symms.size());
+        return { Eldag_perm<P>{ Node_perms<P>(0), Partition(0) }, nullptr };
+    }
+
     Partition init_part(eldag.size());
     init_part.split_by_key(0, init_colour);
 
