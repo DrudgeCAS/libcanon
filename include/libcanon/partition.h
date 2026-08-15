@@ -251,6 +251,11 @@ public:
     template <typename T, typename... It>
     bool split_by_key(Point point, T get_key, It&... its)
     {
+        // An empty partition has no cell to split, and indexing it would be
+        // out of bounds.
+        if (size() == 0)
+            return false;
+
         auto cell_size = get_cell_size(point);
         if (cell_size == 1)
             return false;

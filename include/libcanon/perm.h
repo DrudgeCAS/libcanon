@@ -175,7 +175,8 @@ public:
      */
 
     template <typename T,
-        typename = std::enable_if_t<std::is_constructible<Point_vec, T>::value>>
+        typename = std::enable_if_t<std::is_constructible<Point_vec, T>::value
+            && !std::is_integral<std::decay_t<T>>::value>>
     Perm(T&& pre_images, A acc = 0)
         : images_()
         , pre_images_(std::forward<T>(pre_images))

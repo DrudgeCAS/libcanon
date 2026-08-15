@@ -526,7 +526,7 @@ namespace internal {
             } // End while looping over orbit.
 
             if (orbit.size() == 1) {
-                tentative.release();
+                tentative.reset();
             } else {
                 // We found a point not stabilized.
                 break;
