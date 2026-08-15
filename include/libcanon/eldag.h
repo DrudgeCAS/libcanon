@@ -1023,11 +1023,27 @@ private:
             Orbit orbit(n_valences);
             std::iota(orbit.begin(), orbit.end(), 0);
 
-            for (size_t base = 0; base < n_valences; ++base) {
-                for (const Sims_transv<P>* transv = symms_[node];
-                     transv != nullptr; transv = transv->next()) {
-                    for (const auto& perm : *transv) {
-                        orbit[perm << base] = orbit[base];
+            // The orbit relation has to be closed, not just swept once.  A
+            // single forward pass propagates a label only along the images it
+            // happens to reach in increasing order of the base point, which
+            // leaves points in the same orbit carrying different labels.  Keep
+            // propagating the smaller label until nothing changes, so that
+            // every orbit ends up labelled by its least point.
+            bool changed = true;
+            while (changed) {
+                changed = false;
+                for (size_t base = 0; base < n_valences; ++base) {
+                    for (const Sims_transv<P>* transv = symms_[node];
+                         transv != nullptr; transv = transv->next()) {
+                        for (const auto& perm : *transv) {
+                            size_t img = perm << base;
+                            size_t lo = std::min(orbit[base], orbit[img]);
+                            if (orbit[base] != lo || orbit[img] != lo) {
+                                orbit[base] = lo;
+                                orbit[img] = lo;
+                                changed = true;
+                            }
+                        }
                     }
                 }
             }
