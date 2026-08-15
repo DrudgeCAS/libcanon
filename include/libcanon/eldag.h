@@ -1238,6 +1238,10 @@ std::pair<Eldag_perm<P>, std::unique_ptr<Sims_transv<P>>> canon_eldag(
     if (eldag.size() == 0) {
         // Degenerate input: there is nothing to canonicalize, and the
         // refinement machinery below indexes the partition unconditionally.
+        //
+        // The size agreement is normally checked by the Eldag_coset
+        // constructor, which is skipped here, so it is asserted directly.
+        assert(eldag.size() == symms.size());
         return { Eldag_perm<P>{ Node_perms<P>(0), Partition(0) }, nullptr };
     }
 
