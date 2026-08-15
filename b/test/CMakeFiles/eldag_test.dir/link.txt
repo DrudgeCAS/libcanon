@@ -1,0 +1,1 @@
+/usr/bin/c++ -fsanitize=address,undefined -g -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names -fsanitize=address,undefined CMakeFiles/eldag_test.dir/eldag_test.cpp.o -o eldag_test  ../lib/libgtest_main.a ../lib/libgtest.a

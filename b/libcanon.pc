@@ -1,0 +1,4 @@
+Name: libcanon
+Version: 0.1.0
+Description: Canonicalization of combinatorial objects
+Cflags: -I/usr/local/include

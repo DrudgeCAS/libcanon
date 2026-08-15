@@ -92,7 +92,7 @@ public:
             return *this;
         }
 
-        /** Increments a cell iterator, post-fix version.
+        /** Increments a cell iterator, postfix version.
          */
 
         Cell_it operator++(int)

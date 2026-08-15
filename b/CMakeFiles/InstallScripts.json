@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"/private/tmp/claude-501/-private-tmp-claude-501--Users-guo-Documents-hkustgz-projects-CAS-8852deb0-a87b-481a-a967-3433af1d9dd7-scratchpad-libcanon-issue/956ba8a1-b3b9-4083-ba41-ba8fdbde727e/scratchpad/lc-cellit/b/cmake_install.cmake",
+		"/private/tmp/claude-501/-private-tmp-claude-501--Users-guo-Documents-hkustgz-projects-CAS-8852deb0-a87b-481a-a967-3433af1d9dd7-scratchpad-libcanon-issue/956ba8a1-b3b9-4083-ba41-ba8fdbde727e/scratchpad/lc-cellit/b/include/cmake_install.cmake",
+		"/private/tmp/claude-501/-private-tmp-claude-501--Users-guo-Documents-hkustgz-projects-CAS-8852deb0-a87b-481a-a967-3433af1d9dd7-scratchpad-libcanon-issue/956ba8a1-b3b9-4083-ba41-ba8fdbde727e/scratchpad/lc-cellit/b/test/cmake_install.cmake",
+		"/private/tmp/claude-501/-private-tmp-claude-501--Users-guo-Documents-hkustgz-projects-CAS-8852deb0-a87b-481a-a967-3433af1d9dd7-scratchpad-libcanon-issue/956ba8a1-b3b9-4083-ba41-ba8fdbde727e/scratchpad/lc-cellit/b/test/googletest/cmake_install.cmake",
+		"/private/tmp/claude-501/-private-tmp-claude-501--Users-guo-Documents-hkustgz-projects-CAS-8852deb0-a87b-481a-a967-3433af1d9dd7-scratchpad-libcanon-issue/956ba8a1-b3b9-4083-ba41-ba8fdbde727e/scratchpad/lc-cellit/b/test/googletest/googletest/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
