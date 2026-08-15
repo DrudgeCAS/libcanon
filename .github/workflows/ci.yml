@@ -74,3 +74,35 @@ jobs:
       run: |
         cd build-release
         ctest --output-on-failure
+
+  test_clang_libcxx:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake clang libc++-dev libc++abi-dev
+    
+    - name: Configure CMake (Debug, clang + libc++)
+      run: |
+        mkdir -p build-clang
+        cd build-clang
+        cmake -DCMAKE_BUILD_TYPE=debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS=-stdlib=libc++ ..
+    
+    - name: Build (Debug, clang + libc++)
+      run: |
+        cd build-clang
+        make
+    
+    - name: Run tests (Debug, clang + libc++)
+      run: |
+        cd build-clang
+        ctest --output-on-failure
