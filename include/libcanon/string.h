@@ -464,14 +464,52 @@ std::pair<P, std::unique_ptr<Sims_transv<P>>> canon_string(
     // can be given back to this function.
     aut->conj(canon_perm);
 
-    std::vector<P> aut_gens{};
-    for (const Sims_transv<P>* transv = aut.get(); transv != nullptr;
-         transv = transv->next()) {
-        for (const auto& perm : *transv) {
-            aut_gens.push_back(perm);
+    // The rebuild is only needed when the conjugation actually disturbed the
+    // ordering, which is frequently not the case.  What `Sims_refiner::refine`
+    // needs is that no permutation at or below a level moves any point before
+    // that level's target, equivalently that each level's subgroup fixes every
+    // point before its target.
+    //
+    // That condition is exactly sufficient, not merely necessary.  Under it,
+    // take the lexicographic minimum g* of the string over the group.  At each
+    // level of the branch containing g*, every position before the target is
+    // constant across the level's cosets, so a sibling that beat g* at the
+    // target would beat it lexicographically overall, which cannot happen.  So
+    // g* is never pruned, reaches the candidate set, and the final election
+    // over whole strings returns it.  Degenerate levels are handled too: if the
+    // target is not moved at all then every child ties and nothing is pruned.
+    bool ordered = true;
+    for (const Sims_transv<P>* level = aut.get(); level != nullptr && ordered;
+         level = level->next()) {
+        Point target = level->target();
+        for (const Sims_transv<P>* below = level;
+             below != nullptr && ordered; below = below->next()) {
+            for (const auto& perm : *below) {
+                for (Point i = 0; i < target; ++i) {
+                    if ((perm >> i) != i) {
+                        ordered = false;
+                        break;
+                    }
+                }
+                if (!ordered)
+                    break;
+            }
         }
     }
-    auto rebuilt = build_sims_sys<P>(canon_perm.size(), std::move(aut_gens));
+
+    std::unique_ptr<Sims_transv<P>> rebuilt{};
+    if (ordered) {
+        rebuilt = std::move(aut);
+    } else {
+        std::vector<P> aut_gens{};
+        for (const Sims_transv<P>* transv = aut.get(); transv != nullptr;
+             transv = transv->next()) {
+            for (const auto& perm : *transv) {
+                aut_gens.push_back(perm);
+            }
+        }
+        rebuilt = build_sims_sys<P>(canon_perm.size(), std::move(aut_gens));
+    }
 
     auto min_aut = rebuilt ? min_transv(std::move(rebuilt))
                            : std::unique_ptr<Sims_transv<P>>{};
