@@ -7,6 +7,8 @@
 #ifndef LIBCANON_UTILS_H
 #define LIBCANON_UTILS_H
 
+#include <compare>
+
 namespace libcanon {
 
 // clang-format off
@@ -62,23 +64,29 @@ using Ensure_unique_ptr_t = typename Ensure_unique_ptr<T>::type;
  * The two objects needs to be from classes with `size` method.  The one with
  * greater size is considered less, as in the degrevlex ordering commonly used
  * in Groebner basis theory.  When the sizes are equal, the two quantities will
- * be cast to the given base type and compared.
+ * be cast to the given base type and compared three-way.
  *
  * Note that the given base type need to be given as the base type itself
  * without ref or cv quantification.
+ *
+ * This is deliberately a three-way comparison rather than a `<`.  When a class
+ * derived from a standard container only defines `operator<`, C++20 standard
+ * library components such as `std::pair` and `std::vector` compare it through
+ * the base container's `operator<=>` instead, silently ignoring the derived
+ * class's ordering.  Defining `operator<=>` in terms of this function keeps
+ * the degrev ordering in effect everywhere.
  */
 
 template <typename Base, typename T>
-bool is_degrev_less(const T& left, const T& right)
+std::strong_ordering degrev_compare(const T& left, const T& right)
 {
-    size_t size_l = left.size();
-    size_t size_r = right.size();
+    if (auto cmp = right.size() <=> left.size(); cmp != 0) {
+        return cmp;
+    }
 
     using Base_const_ref = const Base&;
-
-    return size_l > size_r || (size_l == size_r
-                                  && static_cast<Base_const_ref>(left)
-                                      < static_cast<Base_const_ref>(right));
+    return static_cast<Base_const_ref>(left)
+        <=> static_cast<Base_const_ref>(right);
 }
 
 } // End namespace libcanon.

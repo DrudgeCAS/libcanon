@@ -755,9 +755,9 @@ private:
         /** Makes revdeg comparison.
          */
 
-        bool operator<(const Orbit& other) const
+        std::strong_ordering operator<=>(const Orbit& other) const
         {
-            return is_degrev_less<std::vector<Point>>(*this, other);
+            return degrev_compare<Base>(*this, other);
         }
     };
 
@@ -798,9 +798,9 @@ private:
          * earlier.
          */
 
-        bool operator<(const Detailed_edges& other) const
+        std::strong_ordering operator<=>(const Detailed_edges& other) const
         {
-            return is_degrev_less<std::vector<Detailed_edge>>(*this, other);
+            return degrev_compare<std::vector<Detailed_edge>>(*this, other);
         }
     };
 
