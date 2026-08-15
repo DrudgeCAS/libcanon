@@ -456,8 +456,25 @@ std::pair<P, std::unique_ptr<Sims_transv<P>>> canon_string(
     P& canon_perm = canon_form->second;
 
     // Conjugate and minimize the automorphism group.
+    //
+    // The conjugation moves each level's target to its image, which destroys
+    // the invariant that a level's target is the earliest point moved by that
+    // level's subgroup.  Sims_refiner::refine prunes on exactly that
+    // invariant, so the chain has to be rebuilt from its generators before it
+    // can be given back to this function.
     aut->conj(canon_perm);
-    auto min_aut = min_transv(std::move(aut));
+
+    std::vector<P> aut_gens{};
+    for (const Sims_transv<P>* transv = aut.get(); transv != nullptr;
+         transv = transv->next()) {
+        for (const auto& perm : *transv) {
+            aut_gens.push_back(perm);
+        }
+    }
+    auto rebuilt = build_sims_sys<P>(canon_perm.size(), std::move(aut_gens));
+
+    auto min_aut = rebuilt ? min_transv(std::move(rebuilt))
+                           : std::unique_ptr<Sims_transv<P>>{};
 
     return { std::move(canon_perm), std::move(min_aut) };
 }
