@@ -8,6 +8,8 @@
 #define LIBCANON_UTILS_H
 
 #include <compare>
+#include <concepts>
+#include <memory>
 
 namespace libcanon {
 
@@ -67,7 +69,9 @@ using Ensure_unique_ptr_t = typename Ensure_unique_ptr<T>::type;
  * be cast to the given base type and compared three-way.
  *
  * Note that the given base type need to be given as the base type itself
- * without ref or cv quantification.
+ * without ref or cv quantification.  The comparison category of the result is
+ * the one given by the three-way comparison of the base type, since the
+ * comparison of the sizes is always a strong ordering.
  *
  * This is deliberately a three-way comparison rather than a `<`.  When a class
  * derived from a standard container only defines `operator<`, C++20 standard
@@ -78,7 +82,8 @@ using Ensure_unique_ptr_t = typename Ensure_unique_ptr<T>::type;
  */
 
 template <typename Base, typename T>
-std::strong_ordering degrev_compare(const T& left, const T& right)
+std::compare_three_way_result_t<Base> degrev_compare(
+    const T& left, const T& right)
 {
     if (auto cmp = right.size() <=> left.size(); cmp != 0) {
         return cmp;
