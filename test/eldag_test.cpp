@@ -416,3 +416,22 @@ TEST(Test_ccsd_langr, can_be_canonicalized)
         EXPECT_EQ(res.first.partition >> i, expected_order[i]);
     }
 }
+
+/** Tests that an empty eldag can be canonicalized.
+ *
+ * There is nothing to canonicalize, but the refinement machinery used to
+ * index the initial partition unconditionally, which reads out of bounds when
+ * the partition is empty.
+ */
+
+TEST(Test_empty_eldag, can_be_canonicalized)
+{
+    Eldag eldag{};
+    ASSERT_EQ(eldag.size(), 0);
+
+    Node_symms<Simple_perm> symms(0, nullptr);
+    auto res = canon_eldag(eldag, symms, [](auto point) { return 0; });
+
+    EXPECT_EQ(res.first.partition.size(), 0);
+    EXPECT_FALSE(res.second);
+}
